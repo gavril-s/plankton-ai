@@ -6,15 +6,15 @@
   xsi:type="TaskPaneApp">
   <Id>05c2e1c9-3e1d-406e-9a91-e9ac64854994</Id>
   <Version>1.0.0.0</Version>
-  <ProviderName>Contoso</ProviderName>
+  <ProviderName>Plankton AI</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Word AI Assistant"/>
-  <Description DefaultValue="AI-powered writing assistant using OpenRouter"/>
-  <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-64.png"/>
-  <SupportUrl DefaultValue="https://www.contoso.com/help"/>
+  <DisplayName DefaultValue="Plankton AI"/>
+  <Description DefaultValue="AI-powered writing assistant by Plankton AI"/>
+  <IconUrl DefaultValue="https://static2.sharepointonline.com/files/fabric/assets/item-types/32/officescript.png"/>
+  <HighResolutionIconUrl DefaultValue="https://static2.sharepointonline.com/files/fabric/assets/item-types/64/officescript.png"/>
+  <SupportUrl DefaultValue="https://planktonai.ru/help"/>
   <AppDomains>
-    <AppDomain>https://www.contoso.com</AppDomain>
+    <AppDomain>https://planktonai.ru</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Document"/>
@@ -66,23 +66,23 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://localhost:3000/assets/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://localhost:3000/assets/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://localhost:3000/assets/icon-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://static2.sharepointonline.com/files/fabric/assets/item-types/16/officescript.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://static2.sharepointonline.com/files/fabric/assets/item-types/32/officescript.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://static2.sharepointonline.com/files/fabric/assets/item-types/96/officescript.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://go.microsoft.com/fwlink/?LinkId=276812"/>
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://planktonai.ru/docs"/>
         <bt:Url id="Commands.Url" DefaultValue="https://localhost:3000/commands.html"/>
         <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3000/taskpane.html"/>
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="GetStarted.Title" DefaultValue="Get started with Word AI Assistant"/>
-        <bt:String id="CommandsGroup.Label" DefaultValue="AI Assistant"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="Open AI Assistant"/>
+        <bt:String id="GetStarted.Title" DefaultValue="Get started with Plankton AI"/>
+        <bt:String id="CommandsGroup.Label" DefaultValue="Plankton AI"/>
+        <bt:String id="TaskpaneButton.Label" DefaultValue="Open Plankton AI"/>
       </bt:ShortStrings>
       <bt:LongStrings>
         <bt:String id="GetStarted.Description" DefaultValue="Your AI writing assistant is now loaded."/>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Click to open the AI Assistant"/>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Click to open Plankton AI"/>
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>

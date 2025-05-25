@@ -86,4 +86,46 @@ body {
 select.ms-TextField-field {
     height: 32px;
     background-color: white;
+}
+
+/* Document Settings Styles */
+.document-settings {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #e1dfdd;
+    border-radius: 4px;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.setting-item label {
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+
+.margins-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.margins-grid input {
+    width: 100%;
+    padding: 4px;
+    font-size: 12px;
+}
+
+#applySettings {
+    width: 100%;
+    margin-top: 10px;
 } 

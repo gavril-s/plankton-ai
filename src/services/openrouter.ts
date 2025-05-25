@@ -20,6 +20,28 @@ export class OpenRouterService {
     this.apiKey = apiKey;
   }
 
+  async getAvailableModels(): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseUrl}/models`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data; // OpenRouter returns models in data array
+    } catch (error) {
+      console.error('Error fetching models:', error);
+      throw error;
+    }
+  }
+
   async generateCompletion(
     messages: OpenRouterMessage[],
     model: string = 'openai/gpt-3.5-turbo'

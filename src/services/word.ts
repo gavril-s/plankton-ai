@@ -55,17 +55,18 @@ export class WordService {
     return new Promise((resolve, reject) => {
       Word.run(async (context: Word.RequestContext) => {
         const selection = context.document.getSelection();
-        const range = selection.getRange('Whole');
-        range.expandTo(context.document.body);
-        range.load('text');
+        const body = context.document.body;
+        body.load('text');
+        selection.load('text');
         
         try {
           await context.sync();
-          const fullText = range.text;
-          const selectionStart = fullText.indexOf(selection.text);
+          const fullText = body.text;
+          const selectionText = selection.text;
+          const selectionStart = fullText.indexOf(selectionText);
           
           let start = Math.max(0, selectionStart - characterCount);
-          let end = Math.min(fullText.length, selectionStart + selection.text.length + characterCount);
+          let end = Math.min(fullText.length, selectionStart + selectionText.length + characterCount);
           
           resolve(fullText.substring(start, end));
         } catch (error) {

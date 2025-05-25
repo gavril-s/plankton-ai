@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Word AI Assistant</title>
+    <title>Plankton AI</title>
 
     <!-- Office JavaScript API -->
     <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
@@ -12,55 +12,281 @@
     <!-- For more information on Fluent UI, visit https://developer.microsoft.com/fluentui -->
     <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
 
-    <!-- Template styles -->
-    <link href="taskpane.css" rel="stylesheet" type="text/css" />
+    <style>
+        .container {
+            padding: 16px;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .header {
+            margin-bottom: 24px;
+            border-bottom: 1px solid #edebe9;
+            padding-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+            color: #323130;
+        }
+
+        .section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #323130;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #8a8886;
+            border-radius: 2px;
+            font-size: 14px;
+            line-height: 1.5;
+            box-sizing: border-box;
+            transition: border-color 0.15s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: #0078d4;
+            outline: none;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .margins-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .margins-grid input {
+            width: 100%;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .ms-Button {
+            width: 100%;
+            min-height: 32px;
+            padding: 0 16px;
+            border: none;
+            border-radius: 2px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out;
+        }
+
+        .ms-Button--primary {
+            background-color: #0078d4;
+            color: white;
+        }
+
+        .ms-Button--primary:hover {
+            background-color: #106ebe;
+        }
+
+        .status-message {
+            margin-top: 16px;
+            padding: 8px;
+            border-radius: 2px;
+            font-size: 14px;
+        }
+
+        .status-message.success {
+            background-color: #dff6dd;
+            color: #107c10;
+        }
+
+        .status-message.error {
+            background-color: #fde7e9;
+            color: #a4262c;
+        }
+
+        .status-message.loading {
+            background-color: #f3f2f1;
+            color: #323130;
+        }
+
+        .custom-prompt {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #201f1f;
+                color: #ffffff;
+            }
+
+            .section {
+                background-color: #2d2c2c;
+            }
+
+            .header h1, .section-title {
+                color: #ffffff;
+            }
+
+            .form-group label {
+                color: #ffffff;
+            }
+
+            .form-control {
+                background-color: #2d2c2c;
+                border-color: #484644;
+                color: #ffffff;
+            }
+
+            .form-control:focus {
+                border-color: #2899f5;
+            }
+        }
+    </style>
+
+    <script>
+        // Add global error handler
+        window.onerror = function(msg, url, line, col, error) {
+            console.error('Global error:', { msg, url, line, col, error });
+            const statusDiv = document.getElementById('status');
+            if (statusDiv) {
+                statusDiv.textContent = `Error: ${msg} (Line: ${line})`;
+                statusDiv.className = 'status-message error';
+            }
+            return false;
+        };
+
+        // Log when the page loads
+        window.onload = function() {
+            console.log('Taskpane page loaded');
+        };
+    </script>
 </head>
 
-<body class="ms-font-m ms-Fabric">
-    <div id="container" class="ms-Grid">
-        <div class="ms-Grid-row">
-            <div class="ms-Grid-col ms-sm12">
-                <h1 class="ms-font-xl">Word AI Assistant</h1>
-            </div>
+<body class="ms-Fabric">
+    <div class="container">
+        <div class="header">
+            <h1>Plankton AI</h1>
         </div>
-        <div class="ms-Grid-row">
-            <div class="ms-Grid-col ms-sm12">
-                <div class="ms-TextField">
-                    <label class="ms-Label">OpenRouter API Key</label>
-                    <input type="password" id="apiKey" class="ms-TextField-field" />
+
+        <!-- Document Settings Section -->
+        <div class="section">
+            <div class="section-title">Document Settings</div>
+            <div class="settings-grid">
+                <div class="form-group">
+                    <label>Font</label>
+                    <select id="font" class="form-control">
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                    </select>
                 </div>
-            </div>
-        </div>
-        <div class="ms-Grid-row">
-            <div class="ms-Grid-col ms-sm12">
-                <div class="ms-TextField">
-                    <label class="ms-Label">Model</label>
-                    <select id="model" class="ms-TextField-field">
-                        <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                        <option value="openai/gpt-4">GPT-4</option>
-                        <option value="anthropic/claude-2">Claude 2</option>
+                <div class="form-group">
+                    <label>Font Size</label>
+                    <select id="fontSize" class="form-control">
+                        <option value="12">12</option>
+                        <option value="14">14</option>
+                        <option value="16">16</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Line Spacing</label>
+                    <select id="lineSpacing" class="form-control">
+                        <option value="1">Single</option>
+                        <option value="1.5">1.5</option>
+                        <option value="2">Double</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Text Alignment</label>
+                    <select id="textAlignment" class="form-control">
+                        <option value="Left">Left</option>
+                        <option value="Center">Center</option>
+                        <option value="Right">Right</option>
+                        <option value="Justify">Justify</option>
                     </select>
                 </div>
             </div>
+            <div class="form-group">
+                <label>Margins (mm)</label>
+                <div class="margins-grid">
+                    <input type="number" id="marginTop" class="form-control" placeholder="Top" value="20">
+                    <input type="number" id="marginBottom" class="form-control" placeholder="Bottom" value="20">
+                    <input type="number" id="marginLeft" class="form-control" placeholder="Left" value="30">
+                    <input type="number" id="marginRight" class="form-control" placeholder="Right" value="15">
+                </div>
+            </div>
+            <button id="applySettings" class="ms-Button ms-Button--primary">
+                <span class="ms-Button-label">Apply Document Settings</span>
+            </button>
         </div>
-        <div class="ms-Grid-row">
-            <div class="ms-Grid-col ms-sm12">
-                <button id="improveText" class="ms-Button ms-Button--primary">
-                    <span class="ms-Button-label">Improve Text</span>
+
+        <!-- AI Features Section -->
+        <div class="section">
+            <div class="section-title">AI Features</div>
+            <div class="form-group">
+                <label>OpenRouter API Key</label>
+                <input type="password" id="apiKey" class="form-control" placeholder="Enter your API key" />
+            </div>
+            <div class="form-group">
+                <label>Search Models</label>
+                <input type="text" id="modelSearch" class="form-control" placeholder="Search available models..." />
+            </div>
+            <div class="form-group">
+                <label>AI Model</label>
+                <select id="model" class="form-control">
+                    <option value="">Loading models...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Custom Prompt</label>
+                <textarea id="customPrompt" class="form-control custom-prompt" placeholder="Enter your custom prompt here..."></textarea>
+            </div>
+            <div class="button-group">
+                <button id="submitPrompt" class="ms-Button ms-Button--primary">
+                    <span class="ms-Button-label">Custom Prompt</span>
+                </button>
+                <button id="rewriteText" class="ms-Button ms-Button--primary">
+                    <span class="ms-Button-label">Rewrite Text</span>
                 </button>
                 <button id="fixGrammar" class="ms-Button ms-Button--primary">
                     <span class="ms-Button-label">Fix Grammar</span>
                 </button>
-                <button id="generateIdeas" class="ms-Button ms-Button--primary">
-                    <span class="ms-Button-label">Generate Ideas</span>
-                </button>
             </div>
         </div>
-        <div class="ms-Grid-row">
-            <div class="ms-Grid-col ms-sm12">
-                <div id="status" class="status-message"></div>
-            </div>
-        </div>
+
+        <div id="status" class="status-message"></div>
     </div>
 </body>
 </html> 

@@ -41,10 +41,6 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: 'assets/*',
-          to: 'assets/[name][ext]'
-        },
-        {
           from: 'manifest.xml',
           to: 'manifest.xml'
         }
