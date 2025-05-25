@@ -4,6 +4,8 @@ import { Logger } from '../services/logger';
 
 /* global document, Office */
 
+declare const Word: any;
+
 interface OpenRouterModel {
     id: string;
     name: string;
@@ -15,10 +17,51 @@ interface OpenRouterMessage {
     content: string;
 }
 
+interface WordRequestContext {
+    document: WordDocument;
+    sync(): Promise<void>;
+    load(object: any, options?: string[]): void;
+}
+
+interface WordDocument {
+    onSelectionChanged: {
+        add: (handler: () => void) => void;
+        off: (handler: () => void) => void;
+    };
+    body: WordBody;
+    getSelection(): WordRange;
+}
+
+interface WordBody {
+    font: WordFont;
+    paragraphs: {
+        items: WordParagraph[];
+    };
+    text: string;
+}
+
+interface WordFont {
+    name: string;
+    size: number;
+}
+
+interface WordParagraph {
+    lineSpacing: number;
+    alignment: number;
+}
+
+interface WordRange {
+    text: string;
+    insertText(text: string, insertLocation: string): void;
+}
+
 let openRouterService: OpenRouterService;
 let wordService: WordService;
 const logger = Logger.getInstance();
 let availableModels: OpenRouterModel[] = []; // Store models in memory
+let autocompleteTimeout: NodeJS.Timeout | null = null;
+let isAutocompleteEnabled = false;
+let selectionHandler: (() => void) | null = null;
 
 function updateDebugStatus(message: string) {
     logger.log(message);
@@ -47,6 +90,9 @@ Office.onReady(info => {
             const modelSearchElement = document.getElementById('modelSearch');
             const submitPromptElement = document.getElementById('submitPrompt');
             const applySettingsElement = document.getElementById('applySettings');
+            const enableAutocompleteElement = document.getElementById('enableAutocomplete') as HTMLInputElement;
+            const autocompleteDelayElement = document.getElementById('autocompleteDelay') as HTMLInputElement;
+            const clearLogsElement = document.getElementById('clearLogs');
 
             if (!apiKeyElement) logger.log('apiKey element not found', 'error');
             if (!rewriteTextElement) logger.log('rewriteText element not found', 'error');
@@ -54,6 +100,9 @@ Office.onReady(info => {
             if (!modelSearchElement) logger.log('modelSearch element not found', 'error');
             if (!submitPromptElement) logger.log('submitPrompt element not found', 'error');
             if (!applySettingsElement) logger.log('applySettings element not found', 'error');
+            if (!enableAutocompleteElement) logger.log('enableAutocomplete element not found', 'error');
+            if (!autocompleteDelayElement) logger.log('autocompleteDelay element not found', 'error');
+            if (!clearLogsElement) logger.log('clearLogs element not found', 'error');
 
             apiKeyElement?.addEventListener('change', initializeOpenRouter);
             rewriteTextElement?.addEventListener('click', handleRewriteText);
@@ -61,6 +110,45 @@ Office.onReady(info => {
             modelSearchElement?.addEventListener('input', handleModelSearch);
             submitPromptElement?.addEventListener('click', handleSubmitPrompt);
             applySettingsElement?.addEventListener('click', handleApplySettings);
+            clearLogsElement?.addEventListener('click', () => {
+                logger.clearLogs();
+                logger.log('Logs cleared');
+            });
+            
+            // Initialize autocomplete settings from localStorage
+            const savedAutocomplete = localStorage.getItem('enableAutocomplete');
+            const savedDelay = localStorage.getItem('autocompleteDelay');
+            
+            if (savedAutocomplete) {
+                enableAutocompleteElement.checked = savedAutocomplete === 'true';
+            }
+            
+            if (savedDelay) {
+                autocompleteDelayElement.value = savedDelay;
+            }
+
+            // Add autocomplete event listeners
+            enableAutocompleteElement?.addEventListener('change', () => {
+                localStorage.setItem('enableAutocomplete', enableAutocompleteElement.checked.toString());
+                if (enableAutocompleteElement.checked) {
+                    initializeAutocomplete();
+                } else {
+                    removeAutocomplete();
+                }
+            });
+
+            autocompleteDelayElement?.addEventListener('change', () => {
+                localStorage.setItem('autocompleteDelay', autocompleteDelayElement.value);
+                if (enableAutocompleteElement.checked) {
+                    removeAutocomplete();
+                    initializeAutocomplete();
+                }
+            });
+
+            // Initialize autocomplete if enabled
+            if (enableAutocompleteElement?.checked) {
+                initializeAutocomplete();
+            }
             
             logger.log('Event listeners initialized');
             updateDebugStatus('Event listeners initialized');
@@ -329,7 +417,7 @@ async function handleApplySettings() {
     try {
         showStatus('Applying document settings...', 'loading');
 
-        await Word.run(async (context) => {
+        await Word.run(async (context: WordRequestContext) => {
             const document = context.document;
             const body = document.body;
             
@@ -349,7 +437,7 @@ async function handleApplySettings() {
 
             // Apply line spacing and alignment to all paragraphs
             const paragraphs = body.paragraphs;
-            paragraphs.items.forEach(paragraph => {
+            paragraphs.items.forEach((paragraph: WordParagraph) => {
                 paragraph.lineSpacing = parseFloat(lineSpacingElement.value);
                 switch (alignmentElement.value) {
                     case 'Left':
@@ -375,6 +463,98 @@ async function handleApplySettings() {
         console.error('Error applying document settings:', errorMessage);
         showStatus('Error applying document settings. Please try again.', 'error');
     }
+}
+
+function initializeAutocomplete() {
+    if (!openRouterService) {
+        showStatus('Please enter an API key first', 'error');
+        return;
+    }
+
+    try {
+        // Create the handler function
+        selectionHandler = handleSelectionChanged;
+
+        // Use the Office.js event binding
+        Office.context.document.addHandlerAsync(
+            Office.EventType.DocumentSelectionChanged,
+            selectionHandler,
+            (result) => {
+                if (result.status === Office.AsyncResultStatus.Succeeded) {
+                    isAutocompleteEnabled = true;
+                    logger.log('Autocomplete initialized');
+                    showStatus('Autocomplete enabled', 'success');
+                } else {
+                    logger.log(`Failed to register selection handler: ${result.error.message}`, 'error');
+                    showStatus('Failed to enable autocomplete', 'error');
+                }
+            }
+        );
+    } catch (error: any) {
+        logger.log(`Error initializing autocomplete: ${error.message}`, 'error');
+        showStatus('Error initializing autocomplete', 'error');
+    }
+}
+
+function removeAutocomplete() {
+    if (!selectionHandler) {
+        logger.log('No active autocomplete handler to remove');
+        return;
+    }
+
+    try {
+        // Remove the Office.js event binding
+        Office.context.document.removeHandlerAsync(
+            Office.EventType.DocumentSelectionChanged,
+            { handler: selectionHandler },
+            (result) => {
+                if (result.status === Office.AsyncResultStatus.Succeeded) {
+                    isAutocompleteEnabled = false;
+                    selectionHandler = null;
+                    logger.log('Autocomplete removed');
+                    showStatus('Autocomplete disabled', 'success');
+                } else {
+                    logger.log(`Failed to remove selection handler: ${result.error.message}`, 'error');
+                    showStatus('Failed to disable autocomplete', 'error');
+                }
+            }
+        );
+    } catch (error: any) {
+        logger.log(`Error removing autocomplete: ${error.message}`, 'error');
+        showStatus('Error disabling autocomplete', 'error');
+    }
+}
+
+function handleSelectionChanged() {
+    const enableAutocompleteElement = document.getElementById('enableAutocomplete') as HTMLInputElement;
+    const autocompleteDelayElement = document.getElementById('autocompleteDelay') as HTMLInputElement;
+    const model = (document.getElementById('model') as HTMLSelectElement).value;
+
+    if (!enableAutocompleteElement?.checked || !openRouterService || !isAutocompleteEnabled) {
+        return;
+    }
+
+    // Clear existing timeout
+    if (autocompleteTimeout) {
+        clearTimeout(autocompleteTimeout);
+    }
+
+    // Set new timeout
+    const delay = parseInt(autocompleteDelayElement?.value || '1000');
+    autocompleteTimeout = setTimeout(async () => {
+        try {
+            const currentText = await wordService.getSurroundingText(1000); // Get surrounding context
+            if (!currentText) return;
+
+            const suggestion = await openRouterService.autocomplete(currentText, model);
+            if (suggestion) {
+                await wordService.insertText(suggestion);
+                logger.log('Autocomplete suggestion inserted');
+            }
+        } catch (error: any) {
+            logger.log(`Autocomplete error: ${error.message}`, 'error');
+        }
+    }, delay);
 }
 
 function showStatus(message: string, type: 'success' | 'error' | 'loading') {

@@ -117,4 +117,19 @@ export class OpenRouterService {
 
     return this.generateCompletion(messages);
   }
+
+  async autocomplete(text: string, model: string = 'openai/gpt-3.5-turbo'): Promise<string> {
+    const messages: OpenRouterMessage[] = [
+      {
+        role: 'system',
+        content: 'You are an autocomplete assistant. Given the current text, provide a natural continuation that matches the style and context. Keep the continuation concise and relevant. Only provide the continuation text, do not repeat the input text.'
+      },
+      {
+        role: 'user',
+        content: text
+      }
+    ];
+
+    return this.generateCompletion(messages, model);
+  }
 } 

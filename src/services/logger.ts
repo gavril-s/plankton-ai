@@ -1,9 +1,10 @@
 export class Logger {
     private static instance: Logger;
-    private debugDiv: HTMLElement | null;
+    private logsContainer: HTMLElement | null;
+    private maxLogs: number = 100;  // Maximum number of logs to keep
 
     private constructor() {
-        this.debugDiv = document.getElementById('debug');
+        this.logsContainer = document.getElementById('logs');
     }
 
     public static getInstance(): Logger {
@@ -14,20 +15,44 @@ export class Logger {
     }
 
     public log(message: string, level: 'info' | 'error' = 'info'): void {
-        const timestamp = new Date().toISOString();
+        const timestamp = new Date().toLocaleTimeString();
         const prefix = '[Plankton AI]';
-        const formattedMessage = `${prefix} ${timestamp} - ${message}`;
+        const formattedMessage = `${timestamp} - ${message}`;
 
+        // Log to console
         if (level === 'error') {
-            console.error(formattedMessage);
+            console.error(`${prefix} ${formattedMessage}`);
         } else {
-            console.log(formattedMessage);
+            console.log(`${prefix} ${formattedMessage}`);
         }
 
-        // Update debug div if it exists
-        if (this.debugDiv) {
-            this.debugDiv.textContent = formattedMessage;
-            this.debugDiv.className = level === 'error' ? 'debug-error' : 'debug-info';
+        // Add to UI
+        this.addLogToUI(formattedMessage, level);
+    }
+
+    private addLogToUI(message: string, level: 'info' | 'error'): void {
+        if (this.logsContainer) {
+            // Create new log entry
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${level}`;
+            logEntry.textContent = message;
+
+            // Add to container
+            this.logsContainer.appendChild(logEntry);
+
+            // Scroll to bottom
+            this.logsContainer.scrollTop = this.logsContainer.scrollHeight;
+
+            // Remove old logs if exceeding maximum
+            while (this.logsContainer.children.length > this.maxLogs) {
+                this.logsContainer.removeChild(this.logsContainer.firstChild!);
+            }
+        }
+    }
+
+    public clearLogs(): void {
+        if (this.logsContainer) {
+            this.logsContainer.innerHTML = '';
         }
     }
 } 
