@@ -1,6 +1,8 @@
-# Plankton AI Word Add-in
+# Plankton AI
 
-A powerful Microsoft Word Add-in that brings advanced AI capabilities and document formatting tools directly into your Word interface. Powered by Plankton AI's language models, this add-in helps you write better, faster, and more efficiently.
+<img src="assets/logo.png" align="center" alt="Plankton AI Logo" width="300"/>
+
+A Microsoft Word Add-in that integrates with OpenRouter to provide AI-powered writing assistance
 
 ## Table of Contents
 - [Features](#features)
@@ -102,13 +104,14 @@ npm start
 ### Project Structure
 ```
 plankton-ai/
+├── assets/             # Static assets and branding
+│   └── logo.png       # Plankton AI logo
 ├── src/
-│   ├── services/        # Core services (AI, Word, Logger)
-│   └── taskpane/       # Main add-in UI components
-├── assets/             # Static assets
-├── manifest.xml        # Add-in manifest
-├── package.json        # Project dependencies
-└── webpack.config.js   # Build configuration
+│   ├── services/      # Core services (AI, Word, Logger)
+│   └── taskpane/     # Main add-in UI components
+├── manifest.xml       # Add-in manifest
+├── package.json       # Project dependencies
+└── webpack.config.js  # Build configuration
 ```
 
 ### Available Scripts
