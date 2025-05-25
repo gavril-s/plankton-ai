@@ -1,0 +1,89 @@
+/* Office UI Fabric overrides */
+.ms-Grid {
+    padding: 20px;
+}
+
+.ms-Grid-row {
+    margin-bottom: 20px;
+}
+
+.ms-Button {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.ms-Button--primary {
+    background-color: #0078d4;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.ms-Button--primary:hover {
+    background-color: #106ebe;
+}
+
+.ms-TextField {
+    margin-bottom: 15px;
+}
+
+.ms-TextField-field {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #605e5c;
+    border-radius: 2px;
+}
+
+.ms-Label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.status-message {
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 2px;
+    display: none;
+}
+
+.status-message.success {
+    display: block;
+    background-color: #dff6dd;
+    color: #107c10;
+    border: 1px solid #107c10;
+}
+
+.status-message.error {
+    display: block;
+    background-color: #fde7e9;
+    color: #a80000;
+    border: 1px solid #a80000;
+}
+
+.status-message.loading {
+    display: block;
+    background-color: #deecf9;
+    color: #0078d4;
+    border: 1px solid #0078d4;
+}
+
+/* Custom styles */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+
+#container {
+    max-width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+select.ms-TextField-field {
+    height: 32px;
+    background-color: white;
+} 

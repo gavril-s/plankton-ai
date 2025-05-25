@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Word AI Assistant</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+
+    <!-- For more information on Fluent UI, visit https://developer.microsoft.com/fluentui -->
+    <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
+
+    <!-- Template styles -->
+    <link href="taskpane.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="ms-font-m ms-Fabric">
+    <div id="container" class="ms-Grid">
+        <div class="ms-Grid-row">
+            <div class="ms-Grid-col ms-sm12">
+                <h1 class="ms-font-xl">Word AI Assistant</h1>
+            </div>
+        </div>
+        <div class="ms-Grid-row">
+            <div class="ms-Grid-col ms-sm12">
+                <div class="ms-TextField">
+                    <label class="ms-Label">OpenRouter API Key</label>
+                    <input type="password" id="apiKey" class="ms-TextField-field" />
+                </div>
+            </div>
+        </div>
+        <div class="ms-Grid-row">
+            <div class="ms-Grid-col ms-sm12">
+                <div class="ms-TextField">
+                    <label class="ms-Label">Model</label>
+                    <select id="model" class="ms-TextField-field">
+                        <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        <option value="openai/gpt-4">GPT-4</option>
+                        <option value="anthropic/claude-2">Claude 2</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="ms-Grid-row">
+            <div class="ms-Grid-col ms-sm12">
+                <button id="improveText" class="ms-Button ms-Button--primary">
+                    <span class="ms-Button-label">Improve Text</span>
+                </button>
+                <button id="fixGrammar" class="ms-Button ms-Button--primary">
+                    <span class="ms-Button-label">Fix Grammar</span>
+                </button>
+                <button id="generateIdeas" class="ms-Button ms-Button--primary">
+                    <span class="ms-Button-label">Generate Ideas</span>
+                </button>
+            </div>
+        </div>
+        <div class="ms-Grid-row">
+            <div class="ms-Grid-col ms-sm12">
+                <div id="status" class="status-message"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
